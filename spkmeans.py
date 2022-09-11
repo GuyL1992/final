@@ -117,8 +117,7 @@ if __name__ == "__main__":
         exit()
 
     try:
-        match(goal):
-            case (Goals.SPK.value):
+            if goal ==  (Goals.SPK.value):
                 new_data = spkmeans.get_new_data(n,d,k,observations)
                 k = len(new_data[0])
                 df = pd.DataFrame(new_data)
@@ -127,17 +126,21 @@ if __name__ == "__main__":
                 init_centroids = init_centroids.values.tolist()
                 spkmeans.kmeans(n,k,k,new_data,init_centroids)
 
-            case(Goals.WAM.value):
+            elif goal == (Goals.WAM.value):
                 spkmeans.wam(n,d,observations)
 
-            case(Goals.DDG.value):
+            elif goal == (Goals.DDG.value):
                 spkmeans.ddg(n,d,observations)
 
-            case(Goals.LNORM.value):
+            elif goal == (Goals.LNORM.value):
                 spkmeans.lnorm(n,d,observations)
 
-            case(Goals.JACOBI.value):
+            elif goal == (Goals.JACOBI.value):
                 spkmeans.jacobi(n,d,observations)
+            else:
+                print("An Error Has Occured")
+                exit()
+
     except:
         print("An Error Has Occured")
         exit()
