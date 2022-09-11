@@ -842,7 +842,7 @@ int main(int argc, char *argv[]){
 
     flow = argv[1];
     input  = argv[2];
-    argc = atgc - 1;
+    argc = argc - 1;
 
     
     getDimentions(input,&n,&d);
