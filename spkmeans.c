@@ -839,9 +839,12 @@ int main(int argc, char *argv[]){
     int d;
     int n;
     double ** observations;
+    int argsLen;
 
     flow = argv[1];
     input  = argv[2];
+    argsLen = argc;
+
     
     getDimentions(input,&n,&d);
     observations= getObservationsFromInput(input,n,d);
