@@ -51,7 +51,7 @@ double distance(double* a, double* b, int d){
     }
     return distance;
 }
-void findmatch(int* closest_index, double** centroids_in_progress, double** centroids, double* vector,int k, int d){
+void findmatch(int* closest_index, double** centroids, double* vector,int k, int d){
     int i;
     int curr_distance;
     double min_distance = 100000000;
@@ -97,7 +97,7 @@ void kmeansAlgorithm(double** observations, double** centroids, int n, int d,int
 
     while(iterations < MAXITER && !norm_condition){
         for (i = 0; i < n; i ++){
-            findmatch(&closest_index,centroids_in_progress, centroids, observations[i],k,d);
+            findmatch(&closest_index, centroids, observations[i],k,d);
             sizes[closest_index] += 1;
             acumulate_sum(centroids_in_progress[closest_index], observations[i], d);
         }
@@ -150,20 +150,20 @@ enum Goal converttoGoalEnum(char* UserGoal)
 }
         
  
-double** allocationMatrix(int n, int d){ // allocate memory for new matrix - n X d 
+double** allocationMatrix(int n, int d){ /*allocate memory for new matrix - n X d*/ 
 
     int i = 0;
     double** allocatedMatrix =(double **) calloc (n,sizeof(double*));
     assert(allocatedMatrix!=NULL && "An Error Has Occured");
 
     for (i=0; i<n; i++){
-        allocatedMatrix[i] = calloc (n,sizeof(double));
+        allocatedMatrix[i] = calloc (d,sizeof(double));
         assert(allocatedMatrix[i]!=NULL && "An Error Has Occured");
     }
     return allocatedMatrix;
 }
 
-void freeMatrix(double** matrix,int n){ // for given 2D matrix - free all the allocated memory
+void freeMatrix(double** matrix,int n){ /* for given 2D matrix - free all the allocated memory*/
     int i;
     for (i=0; i<n; i++){
         free(matrix[i]); 
@@ -266,8 +266,6 @@ void multiplyMatrix(double** result, double** A, double** B, int n){
      * 
      */
     int k,i,j;
-    double sum;
-
     for( i = 0; i < n; i++){
         for(j = 0; j < n; j ++){
             result[i][j] = 0;
@@ -277,7 +275,6 @@ void multiplyMatrix(double** result, double** A, double** B, int n){
     {
         for(j=0;j<n;j++)
         {
-            sum = 0;
             for(k=0;k<n;k++)
             {
                 result[i][j]+=A[i][k] * B[k][j];
@@ -287,13 +284,13 @@ void multiplyMatrix(double** result, double** A, double** B, int n){
     return;
 }
 
-int checkNegativeZero(double value) // TO check!!! 
+int checkNegativeZero(double value)  
 {
     if (value>-0.00005 && value<0){ return 1;}
     return 0;
 }
 
-void printMatrix(double** matrix, int n, int d) { // print a matrix of dimentions nXd as required format 
+void printMatrix(double** matrix, int n, int d) { /* print a matrix of dimentions nXd as required format */
     int i,j;
     double value;
     for (i = 0; i < n; i++)
@@ -332,7 +329,7 @@ void print_row_vector(double* vector, int n){
 }
 
 /* helper functions for wam process */
-double calcWeight(double* a, double* b, int d)// compute the weight of two observations 
+double calcWeight(double* a, double* b, int d)/*compute the weight of two observations*/
 {
     double sum = 0, norm=0, distance;
     int i=0;
@@ -407,12 +404,11 @@ void formDegreeMatrix (double** degreeMatrix, double** weightedMatrix, int n, in
  * @param n - first dimention
  */
 void formLnormMatrix (double** lNormMatrix, double** weightedMatrix,double** degreeSqrtMatrix, int n){ 
-
+    int i=0,j=0;
     double** temp = allocationMatrix(n,n);
     multiplyMatrix(temp, degreeSqrtMatrix, weightedMatrix,n);
     multiplyMatrix(lNormMatrix, temp, degreeSqrtMatrix,n);
-
-    int i=0,j=0;
+  
         for(i=0;i<n;i++)
         {
             for(j=0;j<n;j++)
@@ -435,7 +431,7 @@ void formLnormMatrix (double** lNormMatrix, double** weightedMatrix,double** deg
 /* helper functions for jacobi process */
 
 void formRotaionAndAtagMatrix(double** P ,double** A, int n){
-    // find the largest element off the diaginal
+    /* find the largest element off the diaginal*/
     int i;
     int j;
     int r;
@@ -451,7 +447,7 @@ void formRotaionAndAtagMatrix(double** P ,double** A, int n){
 
 
 
-    for (i = 0; i < n; i++){ // the matrix is simetric so we can scan just the elemets beyond the diagonal
+    for (i = 0; i < n; i++){ /* the matrix is simetric so we can scan just the elemets beyond the diagonal*/
         for(j = i; j < n; j++){
             if(fabs(A[i][j]) > fabs(maxValue) && i != j ){
                 maxValueRow = i;
@@ -461,7 +457,7 @@ void formRotaionAndAtagMatrix(double** P ,double** A, int n){
         }
     } 
     
-    // compute the rotation values - theta, s,t,c
+    /*compute the rotation values - theta, s,t,c*/
     tetha = (A[maxValueCol][maxValueCol]-A[maxValueRow][maxValueRow])/(2*A[maxValueRow][maxValueCol]);
     tetha < 0 ? (signTetha = -1) : (signTetha = 1);
     tetha < 0 ? (absTetha = - tetha) : (absTetha = tetha);
@@ -471,9 +467,9 @@ void formRotaionAndAtagMatrix(double** P ,double** A, int n){
 
    
 
-    for (i = 0; i < n; i++){ // fill in the new  rotation matrix 
+    for (i = 0; i < n; i++){ /* fill in the new  rotation matrix */
         for(j = 0; j < n; j++){
-            if ((i == maxValueRow && j == maxValueRow) || (i == maxValueCol && j == maxValueCol)) // should be complete
+            if ((i == maxValueRow && j == maxValueRow) || (i == maxValueCol && j == maxValueCol)) /* should be complete*/
                 P[i][j] = c;
             else if (i == j)
                 P[i][j] = 1;
@@ -494,8 +490,8 @@ void formRotaionAndAtagMatrix(double** P ,double** A, int n){
 
     for (r=0;r<n;r++)
     {
-        maxRowcolumn[r] = A[r][i]; // Icol = col maxValueRow 
-        maxColcolumn[r] = A[r][j]; // Jcol = col maxValueCol 
+        maxRowcolumn[r] = A[r][i]; /* Icol = col maxValueRow */
+        maxColcolumn[r] = A[r][j]; /* Jcol = col maxValueCol */
     }
 
     A[i][i] = pow(c,2)*maxRowcolumn[i] + pow(s,2)*maxColcolumn[j] - 2 * s * c * maxColcolumn[i];
@@ -520,7 +516,7 @@ void formRotaionAndAtagMatrix(double** P ,double** A, int n){
     return;
 }
 
-void formIdentityMatrix(double** V, int n){ //Guy
+void formIdentityMatrix(double** V, int n){ 
 
     int i;
     for( i = 0; i < n; i++){
@@ -584,7 +580,7 @@ void jaccobiAlgorithm (double** V, double** A, int n){
     int stopCondition = 1;
     double** P = allocationMatrix(n,n);
     double** temp = allocationMatrix(n,n);
-    formIdentityMatrix(V,n); // first: V equal to the Identity matrix 
+    formIdentityMatrix(V,n); /* first: V equal to the Identity matrix */
 
     do{
         offA = offAtag;
@@ -648,7 +644,7 @@ void sortEigenVectors(double**T, double** eignVectors, double* eignValues, int n
     assert(eignValuesObj!=NULL && "An Error Has Occured");
 
     j = 0;
-    for(i=0; i < n ; i++){ //assign each eignValue to a new object with it's source index in the input matrix
+    for(i=0; i < n ; i++){ /*assign each eignValue to a new object with it's source index in the input matrix*/
         eignValuesObj[i].value = eignValues[i];
         eignValuesObj[i].sourceIndex = j;
         j ++;
@@ -657,7 +653,7 @@ void sortEigenVectors(double**T, double** eignVectors, double* eignValues, int n
 
     qsort(eignValuesObj,n, sizeof(EignValueObj),cmpfuncEignvalues);
     
-    for(i = 0; i < k; i++){ // peek thw grater K vectors and form the T matrix 
+    for(i = 0; i < k; i++){ /* peek thw grater K vectors and form the T matrix */
         currIndex = eignValuesObj[i].sourceIndex;
         for (j = 0; j < n; j++){
             T[j][i] = eignVectors[j][currIndex];
@@ -666,7 +662,7 @@ void sortEigenVectors(double**T, double** eignVectors, double* eignValues, int n
 
 }
 
-void normelize_matrix(double** matrix, int n, int d){ // get "normal" valus of T matrix according to the defenition
+void normelize_matrix(double** matrix, int n, int d){ /*get "normal" valus of T matrix according to the defenition*/
     int i;
     int j;
     double s;
@@ -704,7 +700,7 @@ void normelize_matrix(double** matrix, int n, int d){ // get "normal" valus of T
  * @return int - k 
  */
 
- int cmpfuncDouble (const void * a, const void * b) { // required comparator for The Eigengap Heuristic
+ int cmpfuncDouble (const void * a, const void * b) { /* required comparator for The Eigengap Heuristic */
      int result = 0;
      if (*(double*)a == *(double*)b)
         return result;
@@ -731,24 +727,7 @@ int TheEigengapHeuristic(double* eigenValues, int lenOfArr) {
     
     return index;
 }
-
-// int TheEigengapHeuristic(double* eigenvalues, int len) {
-//     double deltaI = 0;
-//     double currMax = 0;
-//     int position=0;
-//     int i;
-//     qsort(eigenvalues,len, sizeof(double),doubleCmpr);
-//     for(i=1; i<=(len/2);i++){
-//         deltaI = eigenvalues[i]-eigenvalues[i-1];
-//         if (deltaI > currMax){
-//             currMax = deltaI;
-//             position = i;
-//         }
-//     }
-//     return position;
-// }
-
-/* Processes Functions - used for complete Process according to the User Input */
+/*Processes Functions - used for complete Process according to the User Input */
 
 /* main process functions: 
     1. wam process
@@ -795,7 +774,7 @@ void lnormProcess (double** observations, int n, int d){
 
 }
 
-void jacobiProcess(double** observations, int n, int d){
+void jacobiProcess(double** observations, int n){
 
     double** eigenVectors = allocationMatrix(n,n);
     double* eigenValues = (double*) calloc (n,sizeof(double));
@@ -820,6 +799,9 @@ double** getDataPoints(double** observations, int n, int d, int* k){
     double** degreeMatrix = allocationMatrix(n,n);
     double** lNormMatrix = allocationMatrix(n,n);
     double** T;
+    double** eigenVectors = allocationMatrix(n,n);
+    double* eignValues = (double*) calloc (n,sizeof(double));
+    double* eignValuesForHuristic = (double*) calloc (n,sizeof(double));
     
     formWeightedMatrix(weightedMatrix,observations,n,d);
     formDegreeMatrix(degreeMatrix,weightedMatrix,n,regularMode);
@@ -827,9 +809,7 @@ double** getDataPoints(double** observations, int n, int d, int* k){
     freeMatrix(weightedMatrix,n);
     freeMatrix(degreeMatrix,n);
 
-    double** eigenVectors = allocationMatrix(n,n);
-    double* eignValues = (double*) calloc (n,sizeof(double));
-    double* eignValuesForHuristic = (double*) calloc (n,sizeof(double));
+    
 
     jaccobiAlgorithm(eigenVectors,lNormMatrix,n);    
     fill_with_diagonal(eignValues,lNormMatrix,n);
@@ -854,28 +834,17 @@ double** getDataPoints(double** observations, int n, int d, int* k){
 
 int main(int argc, char *argv[]){ 
 
-    int k;
     char* input ;
     char* flow;
     int d;
     int n;
     double ** observations;
 
-    if (argc == 4){
-        k = atoi(argv[1]);
-        flow = argv[2];
-        input  = argv[3];
-    }
-    else{
-        k = 0;
-        flow = argv[1];
-        input  = argv[2];
-    }
-
+    flow = argv[1];
+    input  = argv[2];
+    
     getDimentions(input,&n,&d);
-
     observations= getObservationsFromInput(input,n,d);
-
     switch(converttoGoalEnum(flow)){ 
 
         case wam:
@@ -891,7 +860,7 @@ int main(int argc, char *argv[]){
             break;
 
         case jacobi:
-            jacobiProcess(observations,n,d);
+            jacobiProcess(observations,n);
             break;
         
         default:

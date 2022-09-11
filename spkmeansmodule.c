@@ -97,7 +97,7 @@ static PyObject* jacobi(PyObject *self, PyObject *args){
     }
     sourceDataForC = allocationMatrix(n,d);
     convert_pyMatrix_to_cMatrix(source_dataPy,sourceDataForC,n,d);
-    jacobiProcess(sourceDataForC, n,d);
+    jacobiProcess(sourceDataForC, n);
     freeMatrix(sourceDataForC,n);
     Py_RETURN_NONE;
 }
